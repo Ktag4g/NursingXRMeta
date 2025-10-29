@@ -3,18 +3,14 @@ using Oculus.Interaction;
 
 public class ToolpackSetup : MonoBehaviour
 {
-    public OVRGrabbable grabInteractable;
-
-    public bool isGrabbed;
-    public float triggerPress;
+    public GrabInteractable grabInteractable;
 
     public GameObject[] tools;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        grabInteractable = GetComponent<OVRGrabbable>();
-
+        //Puts all of the tools into the tool package until it is opened
         for (int i = 0; i < tools.Length; i++)
         {
             tools[i].transform.parent = gameObject.transform;
@@ -24,28 +20,25 @@ public class ToolpackSetup : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        //Makes sure that the grab interactable of the tool package has been assigned
         if (grabInteractable != null)
         {
-            if (grabInteractable.isGrabbed == true)
+            //Checks to see if the tool package is being held
+            if (grabInteractable.State == InteractableState.Select)
             {
-                Debug.Log(gameObject.name + " is currently grabbed!");
-
+                //If the tool package is being held, pressing the trigger opens the package
                 if (OVRInput.Get(OVRInput.Axis1D.PrimaryIndexTrigger) > 0.0f)
                 {
+                    //If the package is opened, takes all of the tools out and destroys the packaging
                     for (int i = 0; i < tools.Length; i++)
                     {
                         tools[i].transform.parent = null;
                     }
 
                     Destroy(gameObject);
-
-                    Debug.Log("No more " + gameObject.name);
                 }
             }
         }
-
-        isGrabbed = grabInteractable.isGrabbed;
-        triggerPress = OVRInput.Get(OVRInput.Axis1D.PrimaryIndexTrigger);
     }
 
     
