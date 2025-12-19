@@ -1,4 +1,5 @@
 using UnityEngine;
+using Oculus.Interaction;
 using TMPro;
 
 public class StepManager : MonoBehaviour
@@ -54,13 +55,24 @@ public class StepManager : MonoBehaviour
         "Misc Error: You did not remove the old tegaderm before disinfecting the site."
     };
 
+    public PokeInteractable finishButton;
+    private bool checklistDisplayed = false;
+    public PokeInteractable errorButton;
+    private bool errorsDisplayed = false;
+    private bool hasBeenPressed = false;
+
     public TextMeshPro stepMenuText;
+    private string errorText;
+    public bool debugMode;
 
     public void UpdateChecklist(int step)
     {
         stepChecklist[step] = true;
 
-        stepMenuText.text += stepsText[step] + "\n";
+        if (debugMode)
+        {
+            stepMenuText.text += stepsText[step] + "\n\n";
+        }
     }
 
     public void StepOrderError(int error)
@@ -75,49 +87,99 @@ public class StepManager : MonoBehaviour
          * [5] in FAILED_ORDER_TEXT: Doing [7] before [6]
          */
 
-        switch(error)
+        if (debugMode)
         {
-            //Applied chlorhexadine before removing old tegaderm
-            case 0:
-                Debug.Log("Order Error: Applied chlorhexadine before removing old tegaderm");
-                //Mark Error
-                stepMenuText.text += orderErrorText[0] + " \n";
-                break;
-            
-            //Put on new tegaderm before removing old tegaderm
-            case 1:
-                Debug.Log("Order Error: Put on new tegaderm before removing old tegaderm");
-                //Mark Error
-                stepMenuText.text += orderErrorText[1] + " \n";
-                break;
-            
-            //Attempted to apply chlorhexadine without activating the applicator
-            case 2:
-                Debug.Log("Order Error: Attempted to apply chlorhexadine without activating the applicator");
-                //Mark Error
-                stepMenuText.text += orderErrorText[2] + " \n";
-                break;
-            
-            //Put on the new tegaderm without applying chlorhexadine
-            case 3:
-                Debug.Log("Order Error: Put on the new tegaderm without applying chlorhexadine");
-                //Mark Error
-                stepMenuText.text += orderErrorText[3] + " \n";
-                break;
+            switch (error)
+            {
+                //Applied chlorhexadine before removing old tegaderm
+                case 0:
+                    Debug.Log("Order Error: Applied chlorhexadine before removing old tegaderm");
+                    //Mark Error
+                    stepMenuText.text += orderErrorText[0] + "\n\n";
+                    break;
 
-            //Attempted to put on new tegaderm without exposing sticky side first
-            case 4:
-                Debug.Log("Order Error: Attempted to put on new tegaderm without exposing sticky side first");
-                //Mark Error
-                stepMenuText.text += orderErrorText[4] + " \n";
-                break;
+                //Put on new tegaderm before removing old tegaderm
+                case 1:
+                    Debug.Log("Order Error: Put on new tegaderm before removing old tegaderm");
+                    //Mark Error
+                    stepMenuText.text += orderErrorText[1] + "\n\n";
+                    break;
 
-            //Peeled off outline wrapper of new tegaderm without putting it on first
-            case 5:
-                Debug.Log("Order Error: Peeled off outline wrapper of new tegaderm without putting it on first");
-                //Mark Error
-                stepMenuText.text += orderErrorText[5] + " \n";
-                break;
+                //Attempted to apply chlorhexadine without activating the applicator
+                case 2:
+                    Debug.Log("Order Error: Attempted to apply chlorhexadine without activating the applicator");
+                    //Mark Error
+                    stepMenuText.text += orderErrorText[2] + "\n\n";
+                    break;
+
+                //Put on the new tegaderm without applying chlorhexadine
+                case 3:
+                    Debug.Log("Order Error: Put on the new tegaderm without applying chlorhexadine");
+                    //Mark Error
+                    stepMenuText.text += orderErrorText[3] + "\n\n";
+                    break;
+
+                //Attempted to put on new tegaderm without exposing sticky side first
+                case 4:
+                    Debug.Log("Order Error: Attempted to put on new tegaderm without exposing sticky side first");
+                    //Mark Error
+                    stepMenuText.text += orderErrorText[4] + "\n\n";
+                    break;
+
+                //Peeled off outline wrapper of new tegaderm without putting it on first
+                case 5:
+                    Debug.Log("Order Error: Peeled off outline wrapper of new tegaderm without putting it on first");
+                    //Mark Error
+                    stepMenuText.text += orderErrorText[5] + "\n\n";
+                    break;
+            }
+        }
+        else
+        {
+            switch (error)
+            {
+                //Applied chlorhexadine before removing old tegaderm
+                case 0:
+                    Debug.Log("Order Error: Applied chlorhexadine before removing old tegaderm");
+                    //Mark Error
+                    errorText += orderErrorText[0] + "\n\n";
+                    break;
+
+                //Put on new tegaderm before removing old tegaderm
+                case 1:
+                    Debug.Log("Order Error: Put on new tegaderm before removing old tegaderm");
+                    //Mark Error
+                    errorText += orderErrorText[1] + "\n\n";
+                    break;
+
+                //Attempted to apply chlorhexadine without activating the applicator
+                case 2:
+                    Debug.Log("Order Error: Attempted to apply chlorhexadine without activating the applicator");
+                    //Mark Error
+                    errorText += orderErrorText[2] + "\n\n";
+                    break;
+
+                //Put on the new tegaderm without applying chlorhexadine
+                case 3:
+                    Debug.Log("Order Error: Put on the new tegaderm without applying chlorhexadine");
+                    //Mark Error
+                    errorText += orderErrorText[3] + "\n\n";
+                    break;
+
+                //Attempted to put on new tegaderm without exposing sticky side first
+                case 4:
+                    Debug.Log("Order Error: Attempted to put on new tegaderm without exposing sticky side first");
+                    //Mark Error
+                    errorText += orderErrorText[4] + "\n\n";
+                    break;
+
+                //Peeled off outline wrapper of new tegaderm without putting it on first
+                case 5:
+                    Debug.Log("Order Error: Peeled off outline wrapper of new tegaderm without putting it on first");
+                    //Mark Error
+                    errorText += orderErrorText[5] + "\n\n";
+                    break;
+            }
         }
     }
 
@@ -129,38 +191,113 @@ public class StepManager : MonoBehaviour
          * [2] Put new tegaderm on before chlorhexadine finished drying 
          */
 
-        switch (error)
+        if (debugMode)
         {
-            case 0:
-                //Used gauze to dry chlorhexadine
-                Debug.Log("Misc Error: Used gauze to dry chlorhexadine");
-                stepMenuText.text += miscErrorText[0] + " \n";
-                break;
-            case 1:
-                //Used alcohol swab to disinfect catheter area
-                Debug.Log("Misc Error: Used alcohol swab to disinfect catheter area");
-                stepMenuText.text += miscErrorText[1] + " \n";
-                break;
-            case 2:
-                //Put new tegaderm on before chlorhexadine finished drying
-                Debug.Log("Misc Error: Put new tegaderm on before chlorhexadine finished drying");
-                stepMenuText.text += miscErrorText[2] + " \n";
-                break;
+            switch (error)
+            {
+                case 0:
+                    //Used gauze to dry chlorhexadine
+                    Debug.Log("Misc Error: Used gauze to dry chlorhexadine");
+                    stepMenuText.text += miscErrorText[0] + "\n\n";
+                    break;
+                case 1:
+                    //Used alcohol swab to disinfect catheter area
+                    Debug.Log("Misc Error: Used alcohol swab to disinfect catheter area");
+                    stepMenuText.text += miscErrorText[1] + "\n\n";
+                    break;
+                case 2:
+                    //Put new tegaderm on before chlorhexadine finished drying
+                    Debug.Log("Misc Error: Put new tegaderm on before chlorhexadine finished drying");
+                    stepMenuText.text += miscErrorText[2] + "\n\n";
+                    break;
+            }
+        }
+        else
+        {
+            switch (error)
+            {
+                case 0:
+                    //Used gauze to dry chlorhexadine
+                    Debug.Log("Misc Error: Used gauze to dry chlorhexadine");
+                    errorText += miscErrorText[0] + "\n\n";
+                    break;
+                case 1:
+                    //Used alcohol swab to disinfect catheter area
+                    Debug.Log("Misc Error: Used alcohol swab to disinfect catheter area");
+                    errorText += miscErrorText[1] + "\n\n";
+                    break;
+                case 2:
+                    //Put new tegaderm on before chlorhexadine finished drying
+                    Debug.Log("Misc Error: Put new tegaderm on before chlorhexadine finished drying");
+                    errorText += miscErrorText[2] + "\n\n";
+                    break;
+            }
         }
     }
 
     void DisplayChecklist()
     {
+        stepMenuText.text = "";
+        stepMenuText.text += "Step Checklist: \n\n";
+
         for (int i = 0; i < stepChecklist.Length; i++)
         {
             if (stepChecklist[i] == true)
             {
-                stepMenuText.text += "You did " + stepsText[i];
+                stepMenuText.text += "You did " + stepsText[i] + "\n\n";
             }
             else
             {
-                stepMenuText.text += "You did not " + stepsText[i];
+                stepMenuText.text += "You did not " + stepsText[i] + "\n\n";
             }
+        }
+    }
+
+    void DisplayErrors()
+    {
+        stepMenuText.text = "";
+        stepMenuText.text += "Errors: \n\n" + errorText;
+    }
+
+    private void Update()
+    {
+        if (finishButton.State == InteractableState.Select)
+        {
+            if (checklistDisplayed == false)
+            {
+                DisplayChecklist();
+                checklistDisplayed = true;
+
+                finishButton.gameObject.SetActive(false);
+                errorButton.gameObject.SetActive(true);
+            }
+        }
+
+        if (errorButton.State == InteractableState.Select)
+        {
+            //Ensures that only one thing is triggered per press
+            if (hasBeenPressed == false)
+            {
+                if (errorsDisplayed == false)
+                {
+                    DisplayErrors();
+                    errorButton.gameObject.GetComponentInChildren<TextMeshPro>().text = "Checklist";
+                    errorsDisplayed = true;
+                }
+                else if (errorsDisplayed == true)
+                {
+                    DisplayChecklist();
+                    errorButton.gameObject.GetComponentInChildren<TextMeshPro>().text = "Errors";
+                    errorsDisplayed = false;
+                }
+
+                hasBeenPressed = true;
+            }
+        }
+
+        if (errorButton.State == InteractableState.Normal)
+        {
+            hasBeenPressed = false;
         }
     }
 }

@@ -4,6 +4,7 @@ using UnityEngine;
 public class PatientStatusCheck : MonoBehaviour
 {
     private StepManager stepManager;
+    public GameObject chlorMark;
 
     public bool isDrying = false;
 
@@ -53,10 +54,19 @@ public class PatientStatusCheck : MonoBehaviour
         //Checks to see if the catheter area has chlorhexidine that is actively drying (to make sure the drying is not disturbed)
         if (isDrying)
         {
+            chlorMark.SetActive(true);
+
             if (other.name == "Gauze_Large" || other.name == "Gauze_Small")
             {
                 //If the user dries the chlorhexadine with the gauze instead of air drying, mark error
                 stepManager.StepOtherError(0);
+                isDrying = false;
+            }
+
+            if (other.name == "Alcohol Swab Package")
+            {
+                //If the user dries the chlorhexadine with the gauze instead of air drying, mark error
+                stepManager.StepOtherError(1);
                 isDrying = false;
             }
 
@@ -109,6 +119,7 @@ public class PatientStatusCheck : MonoBehaviour
             //If left to dry untouched, the step is marked as completed
             stepManager.UpdateChecklist(4);
             isDrying = false;
+            chlorMark.SetActive(false);
         }
     }
 }

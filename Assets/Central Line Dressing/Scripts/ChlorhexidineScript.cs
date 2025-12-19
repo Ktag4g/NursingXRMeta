@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using Oculus.Interaction;
 
@@ -5,6 +6,8 @@ public class ChlorhexidineScript : MonoBehaviour
 {    
     private StepManager stepManager;
     public GrabInteractable grabInteractable;
+
+    public SkinnedMeshRenderer chlorhexadineMesh;
 
     private bool isActivated;
 
@@ -32,12 +35,31 @@ public class ChlorhexidineScript : MonoBehaviour
                         //Activates the applicator so the medication can be applied
                         isActivated = true;
 
+                        //Triggers the animation of the chlorhexidine being triggered
+                        StartCoroutine(TriggerChlorhexidineAnim());
+
                         //Updates the step manager to mark the step as complete
                         stepManager.UpdateChecklist(2);
                     }
 
                 }
             }
+        }
+    }
+
+    //Animates the chlorhexidine being triggered using blend shapes
+    IEnumerator TriggerChlorhexidineAnim()
+    {
+        for (int i = 1; i <= 15; i++)
+        {
+            chlorhexadineMesh.SetBlendShapeWeight(0, 100 * i / 15f);
+            yield return new WaitForSeconds(1 / 60f);
+        }
+
+        for (int i = 15; i >= 0; i--)
+        {
+            chlorhexadineMesh.SetBlendShapeWeight(0, 100 * i / 15f);
+            yield return new WaitForSeconds(1 / 60f);
         }
     }
 }

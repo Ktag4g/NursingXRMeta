@@ -1,45 +1,48 @@
+using System.Collections;
 using UnityEngine;
 using Oculus.Interaction;
 
 public class ToolpackSetup : MonoBehaviour
 {
     public GrabInteractable grabInteractable;
+    public Slider slider;
+
+    public SkinnedMeshRenderer mesh;
 
     public GameObject[] tools;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        //Puts all of the tools into the tool package until it is opened
+        //Puts all of the tools into the tool package (under Child "Tool Store" to prevent tools from warping local scale) until it is opened
         for (int i = 0; i < tools.Length; i++)
         {
-            tools[i].transform.parent = gameObject.transform;
+            tools[i].transform.parent = gameObject.transform.GetChild(0).transform;
+            tools[i].GetComponentInChildren<GrabInteractable>().enabled = false;
         }
+
+        mesh.SetBlendShapeWeight(0, 1);
+        mesh.SetBlendShapeWeight(1, 1);
     }
 
     // Update is called once per frame
     void Update()
     {
-        //Makes sure that the grab interactable of the tool package has been assigned
-        if (grabInteractable != null)
+        mesh.SetBlendShapeWeight(0, slider.value * 100);
+        mesh.SetBlendShapeWeight(1, slider.value * 100);
+
+        if (slider.value >= 1)
         {
-            //Checks to see if the tool package is being held
-            if (grabInteractable.State == InteractableState.Select)
+            slider.gameObject.SetActive(false);
+
+            //If the package is opened, takes all of the tools out and destroys the packaging
+            for (int i = 0; i < tools.Length; i++)
             {
-                //If the tool package is being held, pressing the trigger opens the package
-                if (OVRInput.Get(OVRInput.Axis1D.PrimaryIndexTrigger) > 0.0f)
-                {
-                    //If the package is opened, takes all of the tools out and destroys the packaging
-                    for (int i = 0; i < tools.Length; i++)
-                    {
-                        tools[i].transform.parent = null;
-                    }
-
-                    Destroy(gameObject);
-                }
+                tools[i].transform.parent = null;
+                tools[i].GetComponentInChildren<GrabInteractable>().enabled = true;
             }
-        }
-    }
 
-    
+            gameObject.SetActive(false);
+        }    
+    }
 }
